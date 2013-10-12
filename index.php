@@ -6,7 +6,3 @@ $registry->detector->setDefaultPackage('default');
 
 $registry->detector->detectDomainPackage('onlife.com');
 $registry->detector->runPackage();
-
-
-//test frame
-
