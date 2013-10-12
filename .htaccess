@@ -1,0 +1,20 @@
+
+Options -Indexes
+RewriteEngine On
+
+<FilesMatch "\.(tpl|ini|log)">
+ Order deny,allow
+ Deny from all
+</FilesMatch>
+
+RewriteBase /
+RewriteCond %{REQUEST_FILENAME} !-f
+#RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !.*\.(ico|gif|jpg|jpeg|png|js|css)
+RewriteRule ^([^?]*) index.php [L,QSA]
+
+## Исполнение PHP кода в файлах
+RemoveHandler .php .inc .i .html .htm .ajax .xml
+AddType application/x-httpd-php .php .inc .i .html .htm .ajax .xml
+
+## Phenol 2
