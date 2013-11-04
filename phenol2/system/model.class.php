@@ -1,8 +1,8 @@
 <?php
 
-class Model extends EngineBlock
+class Model extends \System\EngineBlock
 {
-	
+	// Что нибудь здесь...
 }
 
 

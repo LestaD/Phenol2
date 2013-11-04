@@ -1,5 +1,5 @@
 <?php
-
+namespace Core;
 
 final class Database
 {
@@ -12,6 +12,15 @@ final class Database
 		$this->driver = null;
 	}
 	
+		
+	/**
+	 * Магический метод __call
+	 * Автоматически вызывается на несуществем методе в текущем объекте
+	 * 
+	 * @param mixed $method
+	 * @param mixed $params
+	 * @return
+	 */
 	public function __call($method, $params)
 	{
 		if ( is_callable(array($this->driver, $method)) == true )
@@ -21,6 +30,18 @@ final class Database
 		return FALSE;
 	}
 	
+		
+	/**
+	 * Инициализация подключение драйвера и соединения с базой данных
+	 * 
+	 * @param mixed $drivername
+	 * @param mixed $host
+	 * @param mixed $user
+	 * @param mixed $pass
+	 * @param mixed $dbase
+	 * @param bool $encoding
+	 * @return void
+	 */
 	public function init( $drivername, $host, $user, $pass, $dbase, $encoding = false )
 	{
 		if ( file_exists(DIR_DRIVER . $drivername . '.php') && is_file( DIR_DRIVER . $drivername . '.php' ) )
@@ -40,6 +61,14 @@ final class Database
 			global $registry;
 			$registry->error->errorDriverLoad($drivername);
 		}
+	}
+	
+	
+	public function query( $sql )
+	{
+		$sql = str_replace("(prefix)", $this->config->db_prefix, $sql);
+		
+		return $this->driver->query($sql);
 	}
 }
 

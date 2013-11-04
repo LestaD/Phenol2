@@ -1,4 +1,15 @@
 <?php
+/**
+ * DriverMysqli
+ * 
+ * Драйвер базы данных для MySQLi
+ * 
+ * @package Phenol2.com
+ * @author LestaD
+ * @copyright 2013
+ * @version 1
+ * @access public
+ */
 final class DriverMysqli {
 	private $link;
 	
@@ -23,6 +34,7 @@ final class DriverMysqli {
   	}
 		
   	public function query($sql) {
+  		
   		$ret = $this->link->real_query($sql);
 		$resource = $this->link->store_result();
 

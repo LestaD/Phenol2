@@ -1,6 +1,20 @@
 <?php
 
-class Phenol2ErrorListener extends ErrorListener
+namespace Core;
+
+/**
+ * Phenol2ErrorListener
+ * 
+ * Класс отлавливающий ошибки
+ * Возможно будет переписан для поддержки исключений
+ * 
+ * @package Phenol2.com
+ * @author LestaD
+ * @copyright 2013
+ * @version 1
+ * @access public
+ */
+class Phenol2ErrorListener extends \System\ErrorListener
 {
 	protected $registry;
 	
@@ -50,6 +64,23 @@ class Phenol2ErrorListener extends ErrorListener
 	{
 		qr('<b>Error:</b> Loading template: ' . $tpl);
 		die();
+	}
+	
+	
+	public function errorFileAccess($file)
+	{
+		qrd('<b>Error:</b> File not found or access forbidden!');
+	}
+	
+	
+	public function errorLoadLangFile($file,$lang)
+	{
+		qrd('<b>Error:</b> Loading file <u>'.$file.'</u> of language <u>'.$lang.'</u>');
+	}
+	
+	public function errorHelperLoad($helper)
+	{
+		qrd('<b>Error:</b> Loading helper: ' . $helper);
 	}
 }
 

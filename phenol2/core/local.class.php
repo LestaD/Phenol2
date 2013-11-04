@@ -1,10 +1,12 @@
 <?php
 
+namespace Core;
+
 
 /**
- * Класс для работы с локализацией сайта
+ * РљР»Р°СЃСЃ РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ Р»РѕРєР°Р»РёР·Р°С†РёРµР№ СЃР°Р№С‚Р°
  * 
- * Должен быть подключен класс Ini;
+ * Р”РѕР»Р¶РµРЅ Р±С‹С‚СЊ РїРѕРґРєР»СЋС‡РµРЅ РєР»Р°СЃСЃ Ini;
  * 
  * @package Phenol
  * @author LestaD
@@ -25,13 +27,14 @@ class Locale
 	private $registry;
 	
 	/**
-	 * Конструктор
+	 * РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 	 * 
-	 * @param mixed $lang - язык локализации
+	 * @param mixed $lang - СЏР·С‹Рє Р»РѕРєР°Р»РёР·Р°С†РёРё
 	 * @return
 	 */
 	public function __construct( &$registry)
 	{
+		$this->registry = $registry;
 		$this->language = 'english';
 		$this->keys = array();
 		$this->filelist = array();
@@ -41,20 +44,22 @@ class Locale
 	
 	
 	/**
-	 * Добавляет файл локализации
+	 * Р”РѕР±Р°РІР»СЏРµС‚ С„Р°Р№Р» Р»РѕРєР°Р»РёР·Р°С†РёРё
 	 * 
-	 * @param mixed $file - имя файла в папке локализации
+	 * @param mixed $file - РёРјСЏ С„Р°Р№Р»Р° РІ РїР°РїРєРµ Р»РѕРєР°Р»РёР·Р°С†РёРё
 	 * @return
 	 */
 	public function add( $file )
 	{
-		$fullfile = $this->folder . $this->language . DS . $file . '.inc';
+		$fullfile = $this->folder . $this->language . DS . $file . '.' .$this->language. '.inc';
 		
 		if ( @file_exists($fullfile) )
 		{
-			$_ = &$this->keys;
-			include $fullfile;
+			$keys = \Toml\Parser2::fromFile($fullfile);
+			$this->keys = array_merge($this->keys, $keys);
 			$this->filelist[$file] = $file;
+		} else {
+			$this->registry->error->errorLoadLangFile($file . '.' .$this->language. '.inc', $this->language);
 		}
 	}
 	
@@ -70,8 +75,8 @@ class Locale
 	{
 		if ( @file_exists( $file ) )
 		{
-			$_ = &$this->keys;
-			include $file;
+			$keys = \Toml\Parser2::fromFile($file);
+			$this->keys = array_merge($this->keys, $keys);
 			$this->filelist[$file] = $file;
 		}
 	}
@@ -79,9 +84,9 @@ class Locale
 	
 	
 	/**
-	 * Установка нового языка
+	 * РЈСЃС‚Р°РЅРѕРІРєР° РЅРѕРІРѕРіРѕ СЏР·С‹РєР°
 	 * 
-	 * @param string $language - язык в формате "english", "russian"
+	 * @param string $language - СЏР·С‹Рє РІ С„РѕСЂРјР°С‚Рµ "english", "russian"
 	 * @return void
 	 */
 	public function setLanguage( $language = "english" )
@@ -97,7 +102,7 @@ class Locale
 	
 	
 	/**
-	 * Возвращает название текущего языка локализации
+	 * Р’РѕР·РІСЂР°С‰Р°РµС‚ РЅР°Р·РІР°РЅРёРµ С‚РµРєСѓС‰РµРіРѕ СЏР·С‹РєР° Р»РѕРєР°Р»РёР·Р°С†РёРё
 	 * 
 	 * @return string
 	 */
@@ -109,7 +114,7 @@ class Locale
 	
 		
 	/**
-	 * Получить список всех языков
+	 * РџРѕР»СѓС‡РёС‚СЊ СЃРїРёСЃРѕРє РІСЃРµС… СЏР·С‹РєРѕРІ
 	 * 
 	 * @return void
 	 */
@@ -123,10 +128,10 @@ class Locale
 	
 	
 	/**
-	 * Перевод указанного слова
+	 * РџРµСЂРµРІРѕРґ СѓРєР°Р·Р°РЅРЅРѕРіРѕ СЃР»РѕРІР°
 	 * 
-	 * @param mixed $word - слово для перевода
-	 * @param string $section - секция поиска (Base)
+	 * @param mixed $word - СЃР»РѕРІРѕ РґР»СЏ РїРµСЂРµРІРѕРґР°
+	 * @param string $section - СЃРµРєС†РёСЏ РїРѕРёСЃРєР° (Base)
 	 * @return string
 	 */
 	public function get( $word )
@@ -137,24 +142,25 @@ class Locale
 	
 	
 	/**
-	 * Поиск указанного слова в списке локализации
-	 * Если слово найдено возвращается его перевод
-	 * Если слова не найдено, то возвращается оригинал
+	 * РџРѕРёСЃРє СѓРєР°Р·Р°РЅРЅРѕРіРѕ СЃР»РѕРІР° РІ СЃРїРёСЃРєРµ Р»РѕРєР°Р»РёР·Р°С†РёРё
+	 * Р•СЃР»Рё СЃР»РѕРІРѕ РЅР°Р№РґРµРЅРѕ РІРѕР·РІСЂР°С‰Р°РµС‚СЃСЏ РµРіРѕ РїРµСЂРµРІРѕРґ
+	 * Р•СЃР»Рё СЃР»РѕРІР° РЅРµ РЅР°Р№РґРµРЅРѕ, С‚Рѕ РІРѕР·РІСЂР°С‰Р°РµС‚СЃСЏ РѕСЂРёРіРёРЅР°Р»
 	 * 
-	 * @param string $word - Слово для перевода
-	 * @param string $section - Секция для поиска слова
-	 * @return string - перевод слова
+	 * @param string $word - РЎР»РѕРІРѕ РґР»СЏ РїРµСЂРµРІРѕРґР°
+	 * @param string $section - РЎРµРєС†РёСЏ РґР»СЏ РїРѕРёСЃРєР° СЃР»РѕРІР°
+	 * @return string - РїРµСЂРµРІРѕРґ СЃР»РѕРІР°
 	 */
 	public function detect( $word, $section = "Base" )
 	{
+		if (isset($this->keys["_".$word])) { return $this->keys["_".$word]; }
 		return isset($this->keys[$word]) ? $this->keys[$word] : $word;
 	}
 	
 	
 		
 	/**
-	 * Является алиасом функции Locale::translate()
-	 * Секция поиска указана по умолчанию - Base
+	 * РЇРІР»СЏРµС‚СЃСЏ Р°Р»РёР°СЃРѕРј С„СѓРЅРєС†РёРё Locale::translate()
+	 * РЎРµРєС†РёСЏ РїРѕРёСЃРєР° СѓРєР°Р·Р°РЅР° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ - Base
 	 * 
 	 * @param string $word
 	 * @return string
@@ -167,7 +173,7 @@ class Locale
 	
 	
 	/**
-	 * Получение списка всех слов текущей локализации
+	 * РџРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° РІСЃРµС… СЃР»РѕРІ С‚РµРєСѓС‰РµР№ Р»РѕРєР°Р»РёР·Р°С†РёРё
 	 * 
 	 * @return array
 	 */

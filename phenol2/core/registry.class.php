@@ -1,8 +1,9 @@
 <?php
 /**
- * @package Phenol2
+ * @package Core
 */
 
+namespace Core;
 
 
 /**

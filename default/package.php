@@ -1,11 +1,20 @@
 <?php
 
+include "errorListener.php";
+
 define( 'DIR_PACKAGE',			dirname(__FILE__).DS );
 
-class PackageDefault extends Package
+class PackageDefault extends \System\Package
 {
 	public function onLoad()
 	{
+		// Загрузка собственного обработчика ошибок
+		$this->load->errorListener("DefaultErrors");
+		
+		// Активация кэширования
+		$this->cache->Enable(DIR_PACKAGE);
+		
+		// Получаение аргументов запроса
 		$args = $this->request->arguments = $this->detector->getArguments();
 		
 		/*
@@ -19,7 +28,9 @@ class PackageDefault extends Package
 		);
 		//*/
 		
-		qr(DIR_ROOT);
+		//qr($this->config);
+		
+		//qr(DIR_ROOT);
 		
 		$this->locale->folder = DIR_PACKAGE . 'language' . DS;
 		$this->locale->setLanguage('russian');
@@ -29,12 +40,12 @@ class PackageDefault extends Package
 		
 		if ( count($args) == 0 )
 		{
-			$this->load->controller('_/not_social');
+			$this->load->controller('common/default');
 			$this->controller->fireAction('default');
 		}
 		elseif ( count($args) == 1 )
 		{
-			$this->load->controller('_/'.$args[0]);
+			$this->load->controller('common/'.$args[0]);
 			$this->controller->fireAction('default');
 		}
 		elseif ( count($args) == 2 )

@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>{_base_title}</title>
+<title>{Title}</title>
 </head>
 <body>
-{header}
-{a1} {a2} {a3}
-<?=$body?>
-{body2}
+{header}<br /><br />
+{body}<br /><br />
+{_Example}<br /><br />
 {footer}
 {footer2}
 </body>

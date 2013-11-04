@@ -1,8 +1,21 @@
 <?php
 
-abstract class Controller extends EngineBlock
+
+abstract class Controller extends \System\EngineBlock
 {
+	public function getName()
+	{
+		return get_class($this);
+	}
 	
+	
+	
+	/**
+	 * Активация указанного действия для текущего контроллера
+	 * 
+	 * @param mixed $action
+	 * @return void
+	 */
 	public function fireAction( $action )
 	{
 		$target = createClassname($action, 'Action');
@@ -16,12 +29,24 @@ abstract class Controller extends EngineBlock
 		}
 	}
 	
+	
+	
+	/**
+	 * Перенаправление
+	 * ( по моему не сложно догадаться )
+	 * 
+	 * @param mixed $url
+	 * @param integer $status
+	 * @return void
+	 */
 	protected function redirect( $url, $status = 302 )
 	{
 		header('Status: ' . $status);
 		header('Location: ' . str_replace(array('&amp;', "\n", "\r"), array('&', '', ''), $url));
 		exit();
 	}
+	
+	
 	
 	
 }
