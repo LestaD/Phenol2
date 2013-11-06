@@ -98,13 +98,62 @@ class CCommonRegister extends Controller
 	
 	public function ActionCommit2()
 	{
+		// Пользователь уже вошел
+		if ( isset( $this->request->session['user_id'] ) )
+		{
+			$this->redirect("/");
+			return;
+		}
 		
+		$this->load->model("common/register");
+		if ( isset( $this->request->post['data'] ) and chk( $this->request->post['data'], 'name', 'surname', 'passwr', 'repeat' ) and chk( $this->request->session['register'], 'email', 'login' ) )
+		{
+			$data = array();
+			foreach ( $this->request->post['data'] as $key=>$value )
+			{
+				$data[$key] = trim($this->db->escape(clean($value)));
+			}
+			
+			if ( chke( $data ) and chke($this->request->session['register']) )
+			{
+				if ( $this->model->common_register->FindUserByLoginOrEmail($this->request->session['register']['email'], $this->request->session['register']['login']) )
+				{
+					$this->request->session['register_error'] = 'error_reg_exists';
+					$this->redirect('/common/register');
+					return;
+				}
+				
+				if ( $data['passwr'] == $data['repeat'] ) {
+					$this->model->common_register->PreRegisterUser(
+						$this->request->session['register']['email'],
+						$this->request->session['register']['login'],
+						$data['name'],
+						$data['surname'],
+						$data['passwr']
+					);
+					unset($this->request->session['register_error']);
+					$this->redirect('/common/login');
+					return;
+				}
+				else
+				{
+					$this->request->session['register_error'] = 'error_reg_passw';
+					$this->redirect('/common/register/step2');
+					return;
+				}
+			}
+			
+		}
+		
+		$this->request->session['register_error'] = 'error_reg_emp';
+		$this->redirect('/common/register/step2');
 	}
 	
 	
 	
 	public function ActionStep2()
 	{
+		
 		$this->load->model("common/register");
 		$this->load->language("common/register");
 		$this->load->helper("common/page");

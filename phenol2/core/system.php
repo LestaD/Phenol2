@@ -26,11 +26,11 @@ function chk()
 {
 	$num = func_num_args();
 	$array = func_get_arg(0);
-	$ret = false;
+	$ret = true;
 	for ( $i = 1; $i < $num; $i++ )
 	{
 		$z = func_get_arg($i);
-		$ret = isset( $array[$z] );
+		$ret = isset( $array[$z] ) && $ret;
 	}
 	return $ret;
 }
@@ -38,11 +38,12 @@ function chk()
 // Check for empty or ''
 function chke( $arr )
 {
-	$ret = false;
+	$ret = true;
+	if ( count($arr) < 1 ) { return false; }
 	foreach ( $arr as $key=>$value )
 	{
 		$value = str_replace(' ', '', $value);
-		$ret = ($value=='' OR $value == 'NULL' OR $value == false ) ? false : true; 
+		$ret = ($value=='' OR $value == 'NULL' OR $value == false ) && $ret ? false : true; 
 	}
 	return $ret;
 }

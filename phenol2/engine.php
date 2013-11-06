@@ -49,6 +49,10 @@ $phenol->detector = new Core\Detector($phenol);
 include DIR_CORE . 'loader.class.php';
 $phenol->load = new Core\Loader($phenol);
 
+// 
+include DIR_CORE . 'crypt.class.php';
+$phenol->crypt = new Core\Crypt;
+
 // Кэширование данных
 include DIR_CORE . 'cache.class.php';
 $phenol->cache = new Core\Cache($phenol);

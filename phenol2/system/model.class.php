@@ -2,7 +2,21 @@
 
 class Model extends \System\EngineBlock
 {
-	// Что нибудь здесь...
+	
+	
+	
+	public function query( $sql )
+	{
+		return $this->db->query( $sql );
+	}
+	
+	
+	public function escape( $v )
+	{
+		return $this->db->escape($v);
+	}
+	
+	
 }
 
 

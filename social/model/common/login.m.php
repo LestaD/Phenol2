@@ -15,6 +15,17 @@ class ModelCommonLogin extends Model
 		return false;
 	}
 	
+	public function LoginUser( $emailogin, $password )
+	{
+		$emailogin = $this->db->escape($emailogin);
+		$password = $this->crypt->UserPassword($password);
+		
+		$q = $this->query("SELECT * FROM `(prefix)user` WHERE (`login`='$emailogin' OR `email`='$emailogin') AND `password`='$password'");
+		
+		return $q->num_rows > 0 ? true : false;
+		
+	}
+	
 	
 }
 

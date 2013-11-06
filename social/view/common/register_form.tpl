@@ -17,8 +17,8 @@
 				<input type="text" class="input" name="data[surname]" placeholder="{_your_surname}" />
 			</div>
 			<div class="box-inputs">
-				<input type="text" class="input" name="data[passwr]" placeholder="{_password}" />
-				<input type="text" class="input" name="data[repeat]" placeholder="{_repeat_password}" />
+				<input type="password" class="input" name="data[passwr]" placeholder="{_password}" />
+				<input type="password" class="input" name="data[repeat]" placeholder="{_repeat_password}" />
 			</div>
 			<? } ?>
 			<div class="box-buttons">

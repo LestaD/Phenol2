@@ -17,7 +17,18 @@ class ModelCommonRegister extends Model
 	}
 	
 	
-	
+	public function PreRegisterUser( $email, $login, $name, $surname, $password )
+	{
+		$email = $this->db->escape($email);
+		$login = $this->db->escape($login);
+		$name = $this->db->escape($name);
+		$surname = $this->db->escape($surname);
+		$password = $this->crypt->UserPassword($password);
+		
+		$regdate = time();
+		
+		$this->db->query("INSERT INTO `(prefix)user` (`login`,`email`,`password`,`name`,`surname`,`register_date`) VALUES ('$login', '$email', '$password', '$name', '$surname','$regdate')");
+	}
 }
 
 

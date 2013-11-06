@@ -61,10 +61,22 @@ class CCommonLogin extends Controller
 					$this->request->session['login_error'] = 'error_eml_login_wrong';
 					$this->request->session['recovery'] = true;
 					$this->redirect('/common/login');
+					return;
 				}
 				
+				$auth = $this->model->common_login->LoginUser($email, $password);
+				if ( !$auth )
+				{
+					$this->request->session['login_error'] = 'error_eml_passw_wrong';
+					$this->request->session['recovery'] = true;
+					$this->redirect('/common/login');
+					return;
+				}
 				
-				
+				$this->request->session['user_id'] =  ( (int)$user['id'] );
+				unset( $this->request->session['recovery'], $this->request->session['login_error'], $this->request->session['register'] );
+				$this->redirect("/");
+				return;
 			}
 			
 			$this->request->session['login_error'] = 'error_eml_not_enter';
@@ -76,9 +88,14 @@ class CCommonLogin extends Controller
 			$this->request->session['login_error'] = 'error_eml_not_enter';
 			$this->redirect('/common/login');
 		}
-		
-		
-		
 	}
+	
+	
+	public function ActionLogout()
+	{
+		unset($this->request->session['user_id']);
+		$this->redirect("/");
+	}
+	
 }
 
