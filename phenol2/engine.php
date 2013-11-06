@@ -1,6 +1,6 @@
 <?php
 define( 'ENGINE',			'Phenol');
-define( 'VERSION',			'2.0.0' );
+define( 'VERSION',			'2.0.1' );
 
 define( 'DS',				'/' );
 define( 'DIR_ENGINE',		dirname(__FILE__) . DS );
