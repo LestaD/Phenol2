@@ -1,4 +1,5 @@
 <?php
+if ( version_compare( PHP_VERSION, "5.4.5", "<" ) ) { exit( "PHP version must be higher than 5.4"); }
 require 'phenol2/engine.php';
 
 // Поиск пакетов приложений будет производиться в папке
