@@ -5,15 +5,18 @@ require 'phenol2/engine.php';
 // Поиск пакетов приложений будет производиться в папке
 $phenol->detector->searchPackagesIn(dirname(__FILE__).DS.'%package%'.DS);
 
+$phenol->detector->default_package = "default";
+
 // Определение текущего домена
-if ( $phenol->detector->getCurrentSubdomain() ) {
+$subdomain = $phenol->detector->getCurrentSubdomain();
+if ( $subdomain ) {
 	// Запуск пакета по имени домена
-	$phenol->detector->setPackage($phenol->detector->getCurrentSubdomain());
+	$phenol->detector->setPackage($phenol->detector->detectAlias($subdomain));
 }
 else
 {
 	// Запуск стандартного пакета
-	$phenol->detector->setPackage("default");
+	$phenol->detector->setPackage("lestad");
 }
 
 

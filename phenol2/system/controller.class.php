@@ -9,7 +9,6 @@ abstract class Controller extends \System\EngineBlock
 	}
 	
 	
-	
 	/**
 	 * Активация указанного действия для текущего контроллера
 	 * 

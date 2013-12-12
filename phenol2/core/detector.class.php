@@ -16,7 +16,7 @@ namespace Core;
  */
 final class Detector
 {
-	private $default_package = 'www';
+	public $default_package = 'www';
 	private $search_path = '';
 	private $load_package = false;
 	private $request_uri;
@@ -88,11 +88,33 @@ final class Detector
 	
 		
 	/**
-	 * !!! УСТАРЕЛО !!!
+	 * Определение пакета по алиасу домена
 	 * 
-	 * TO REMOVE!
+	 * @param string $domain - alias or real package
+	 * @return string - package
+	 */
+	public function detectAlias($domain)
+	{
+		$uri = $_SERVER['HTTP_HOST'];
+		$packagepath = str_replace('%package%', $domain, $this->search_path);
+		if ( file_exists( $packagepath ) && is_dir( $packagepath ) ) {
+			return $domain;
+		} else {
+			foreach ( $this->registry->fconfig->Aliases as $p_name=>$p_data )
+			{
+				if ( in_array($domain, $p_data) ) {
+					return $p_name;
+				}
+			}
+		}
+	}
+	
+	
+	
+	/**
 	 * 
-	 * @param mixed $domain
+	 * 
+	 * @param - $domain
 	 * @return
 	 */
 	public function detectDomainPackage( $domain )
