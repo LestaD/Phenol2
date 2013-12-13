@@ -40,6 +40,8 @@ class Cache
 		}
 		$this->Folder = $folder;
 		$this->enabled = true;
+		
+		header("Cache-Control: max-age=" . $this->tLong);
 	}
 	
 		
