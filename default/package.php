@@ -1,12 +1,12 @@
 <?php
 
-include "errorListener.php";
+if ( version_compare( VERSION, "2.0.3", "<" ) ) { qrd( "Old Phenol2 version! Package uses 2.0.3"); }
 
-define( 'DIR_PACKAGE',			dirname(__FILE__).DS );
+include "errorListener.php";
 
 class PackageDefault extends \System\Package
 {
-	public function onLoad()
+	public function onRun( $args )
 	{
 		// Загрузка собственного обработчика ошибок
 		$this->load->errorListener("DefaultErrors");
@@ -14,50 +14,28 @@ class PackageDefault extends \System\Package
 		// Активация кэширования
 		$this->cache->Enable(DIR_PACKAGE);
 		
-		// Получаение аргументов запроса
-		$args = $this->request->arguments = $this->detector->getArguments();
+		// Запуск базы данных по стандартным параметрам
+		//$this->db->init();
 		
-		/*
-		$this->db->init(
-			$this->config->driver,
-			$this->config->db_host,
-			$this->config->db_user,
-			$this->config->db_pass,
-			$this->config->db_base,
-			$this->config->db_encode
-		);
-		//*/
+		// Определение лучшего языка для пользователя
+		$this->fconfig->i['user_language'] = $this->detector->LanguageMatchBest(array(
+			'ru' => array('ru', 'be', 'uk', 'ky', 'ab', 'mo', 'et', 'lv'),
+		), $this->fconfig->i['default_language']);
 		
-		//qr($this->config);
-		
-		//qr(DIR_ROOT);
-		
+		// Директория с файлами перевода
 		$this->locale->folder = DIR_PACKAGE . 'language' . DS;
-		$this->locale->setLanguage('russian');
-		$this->locale->add('russian');
+		
+		// Установка текущего языка
+		$this->locale->setLanguage($this->fconfig->i['user_language']);
+		
+		// Подгрузка основного файла перевода
+		$this->locale->add('common');
+		
+		// Директория шаблонов
 		$this->view->folder = DIR_PACKAGE . 'view' . DS;
 		
-		
-		if ( count($args) == 0 )
-		{
-			$this->load->controller('common/default');
-			$this->controller->fireAction('default');
-		}
-		elseif ( count($args) == 1 )
-		{
-			$this->load->controller('common/'.$args[0]);
-			$this->controller->fireAction('default');
-		}
-		elseif ( count($args) == 2 )
-		{
-			$this->load->controller($args[0].'/'.$args[1]);
-			$this->controller->fireAction('default');
-		}
-		elseif ( count($args) > 2 )
-		{
-			$this->load->controller($args[0].'/'.$args[1]);
-			$this->controller->fireAction($args[2]);
-		}
+		// Запуск контроллера по стандартной схеме
+		$this->detector->runControllerScheme( $args );
 	}
 }
 

@@ -1,6 +1,6 @@
 <?php
-if ( version_compare( PHP_VERSION, "5.4.5", "<" ) ) { exit( "PHP version must be higher than 5.4"); }
-require 'phenol2/engine.php';
+if ( version_compare( PHP_VERSION, "5.3.0", "<" ) ) { exit( "PHP version must be higher than 5.3"); }
+require '_phenol2/engine.php';
 
 // Поиск пакетов приложений будет производиться в папке
 $phenol->detector->searchPackagesIn(dirname(__FILE__).DS.'%package%'.DS);

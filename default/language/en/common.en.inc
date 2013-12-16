@@ -1,0 +1,2 @@
+default			= "Default"
+example			= "Example"
