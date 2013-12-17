@@ -296,13 +296,11 @@ class View {
 	public function dispatch() {
 		if ( $this->error ) return;
 		
-		//$this->assign( $this->default_vars() );
-		
 		$code = $this->template != false ? $this->ReadTemplate( $this->folder . $this->template . '.tpl' ) : $this->code;
 		
 		// Врезка дочерних шаблонов
 		foreach ( $this->childsv as $var => $value )
-			$code = str_replace( "{" . $var . "}", $value, $code );
+			$code = str_replace( "{\$" . $var . "}", $value, $code );
 		
 		// Чтение всех переменных и загрузка их в шаблон
 		$vals = (array)$this->values;
@@ -320,10 +318,11 @@ class View {
 			$code = str_replace( "{_" . $var . "}", $value, $code );
 		}
 		
+		$all = array_merge((array)$this->values, $vals);
 		
 		$sourcecode = "";
 		{
-			extract( $vals );
+			extract( $all );
 			ob_start();
 			
 			eval("?>$code<?php\r\n");
@@ -333,9 +332,11 @@ class View {
 		}
 		
 		// Удаление комментариев в шаблоне
-		$sourcecode = preg_replace("/({;.*?})/", "", $sourcecode);
+		$sourcecode = preg_replace("/({\$;.*?})/", "", $sourcecode);
+		$sourcecode = preg_replace("/({_;.*?})/", "", $sourcecode);
 		$sourcecode = preg_replace("/^(;;.*?\r\n)/m", "", $sourcecode);
-		$sourcecode = preg_replace("/{.*?}/", '', $sourcecode);
+		$sourcecode = preg_replace("/{\$.*?}/", '', $sourcecode);
+		$sourcecode = preg_replace("/{_.*?}/", '', $sourcecode);
 		
 		return $sourcecode;
 	}
