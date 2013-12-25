@@ -27,10 +27,12 @@ final class DriverMysqli {
   	
   	public function encoding( $encoding )
   	{
-  		$this->link->real_query("SET NAMES '$encoding'");
 		$this->link->real_query("SET CHARACTER SET $encoding");
-		$this->link->real_query("SET CHARACTER_SET_CONNECTION=$encoding");
-		$this->link->real_query("SET SQL_MODE = ''");
+		$this->link->real_query("set character_set_client='$encoding'");
+		$this->link->real_query("set character_set_results='$encoding'");
+		$this->link->real_query("set collation_connection='$encoding'");
+		$this->link->real_query("SET NAMES $encoding");
+		$this->link->set_charset($encoding);
   	}
 		
   	public function query($sql) {

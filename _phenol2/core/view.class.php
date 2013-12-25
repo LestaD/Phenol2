@@ -282,8 +282,8 @@ class View {
         $default['ENGINE'] = ENGINE;
         $default['VERSION'] = VERSION;
         $default['AUTHOR'] = AUTHOR;
-        // Локализация
-        return array_merge( $this->registry->locale->getAllArray(), $default );
+        
+        return $default;
 	}
 	
 	
@@ -303,7 +303,7 @@ class View {
 			$code = str_replace( "{\$" . $var . "}", $value, $code );
 		
 		// Чтение всех переменных и загрузка их в шаблон
-		$vals = (array)$this->values;
+		$vals = array_merge( (array)$this->values, $this->default_vars() );
 		foreach ( $vals as $var => $value )
 		{
 			if ( !is_int( $value ) && !is_float($value) && !is_string($value) ) continue;
@@ -311,7 +311,7 @@ class View {
 		}
 		
 		// Перевод
-		$vals = (array)$this->default_vars();
+		$vals = (array)$this->registry->locale->getAllArray();
 		foreach ( $vals as $var => $value )
 		{
 			if ( !is_int( $value ) && !is_float($value) && !is_string($value) ) continue;
@@ -332,8 +332,7 @@ class View {
 		}
 		
 		// Удаление комментариев в шаблоне
-		$sourcecode = preg_replace("/({\$;.*?})/", "", $sourcecode);
-		$sourcecode = preg_replace("/({_;.*?})/", "", $sourcecode);
+		$sourcecode = preg_replace("/({\;.*?})/", "", $sourcecode);
 		$sourcecode = preg_replace("/^(;;.*?\r\n)/m", "", $sourcecode);
 		$sourcecode = preg_replace("/{\$.*?}/", '', $sourcecode);
 		$sourcecode = preg_replace("/{_.*?}/", '', $sourcecode);
@@ -351,7 +350,7 @@ class View {
 	public function render()
 	{
 		if ( $this->error ) return;
-        
+        header("Content-type: text/html; charset=" . $this->config->db_encode ?: 'utf-8');
 		echo $this->dispatch();
 	}
 }
