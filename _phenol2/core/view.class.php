@@ -353,4 +353,36 @@ class View {
         header("Content-type: text/html; charset=" . $this->config->db_encode ?: 'utf-8');
 		echo $this->dispatch();
 	}
+	
+	
+	/**
+	 * array(
+	 * 	'name' => 'link',
+	 * 	'name' => false
+	 * )
+	 */
+	public function generateBreadcrumbs(array $breadcrumbs)
+	{
+		$count = count($breadcrumbs);
+		if ( $count > 0 )
+		{
+			$cur = 0;
+			$code = '';
+			foreach( $breadcrumbs as $name=>$link )
+			{
+				$code .= $link ? '<a href="'.$link.'">'.$this->locale->translate($name).'</a>' : '<span>'.$this->locale->translate($name).'</span>';
+				$cur++;
+				if ( $cur != $count )
+				{
+					$code .= ' &raquo; ';
+				}
+			}
+			$this->set('breadcrumbs', $code);
+		}
+	}
+	
+	public function _title($tag)
+	{
+		$this->tr('title', $tag);
+	}
 }
