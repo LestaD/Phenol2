@@ -16,6 +16,7 @@ Delete			= "Удалить"
 Remove			= "Убрать"
 Show			= "Показать"
 Hide			= "Скрыть"
+Add				= "Добавить"
 
 January			= "Январь"
 February		= "Февраль"

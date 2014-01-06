@@ -320,6 +320,8 @@ class View {
 		
 		$all = array_merge((array)$this->values, $vals);
 		
+		$all['registry'] = $this->registry;
+		
 		$sourcecode = "";
 		{
 			extract( $all );

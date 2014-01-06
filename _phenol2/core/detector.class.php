@@ -214,7 +214,10 @@ final class Detector extends \System\EngineBlock
 	 */
 	public function isFileRequested()
 	{
-		$info = pathinfo($this->request_uri);
+		
+		$uri = explode('?', $this->request_uri, 2);
+		
+		$info = pathinfo($uri[0]);
 		
 		return isset( $info['extension'] );
 	}
