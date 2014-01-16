@@ -56,6 +56,10 @@ include DIR_CORE . 'db.class.php';
 $phenol->db = new Core\Database( $phenol );
 
 
+function ParseTomlFile($file) {
+	return (object)\Toml\Parser2::fromFile( $file );
+}
+
 
 
 
