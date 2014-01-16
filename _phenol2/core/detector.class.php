@@ -217,6 +217,8 @@ final class Detector extends \System\EngineBlock
 		
 		$uri = explode('?', $this->request_uri, 2);
 		
+		//qr($uri);
+		
 		$info = pathinfo($uri[0]);
 		
 		return isset( $info['extension'] );
@@ -261,8 +263,45 @@ final class Detector extends \System\EngineBlock
 		
 		// Проверка наличия файла
 		if ( is_file( $package . DS . $file ) && file_exists( $package . DS . $file ) && $accept ) {
-			header('Content-Type: ' . $mime, true);
 			$code = file_get_contents($package . DS . $file);
+			header('Content-Type: ' . $mime, true);
+			
+			$h304="HTTP/1.x 304 Not Modified";
+			$match = ""; $since = ""; $varr = array(); $varrvis = array();
+			if (array_key_exists("HTTP_HOST",$_ENV)) $varr =& $_ENV;
+			if (array_key_exists("HTTP_HOST",$_SERVER)) $varr =& $_SERVER;
+			if (isset($varr["HTTP_IF_NONE_MATCH"])) $match = $varr["HTTP_IF_NONE_MATCH"];
+			$match = trim( strval($match) );
+			if ( isset($varr["HTTP_IF_MODIFIED_SINCE"]) ) $since = $varr["HTTP_IF_MODIFIED_SINCE"];
+			$since = explode(";",$since);
+			$since = strtotime( trim($since[0] ));
+			
+			$etag = '"' . md5($code) . '"';
+			header('ETag: ' . $etag);
+			header('Cache-Control: public, max-age=3600');
+			
+			header("Accept-Ranges: bytes");
+			header("Expires: ".gmdate("r")." GMT");
+			header("Connection: Keep-Alive");
+			header("Keep-Alive: timeout=5, max=100");
+			header("Last-Modified: " . gmdate("r", filemtime( $package . DS . $file )) . " GMT");
+			
+			
+			$since = (int)$since;
+			$dat = (int)filemtime($package . DS . $file);
+			
+			if ($since == $dat) {
+				if ( $match==$etag){
+					$varrvis[0]=$h304;
+					header($h304);
+					header("Connection: Close");
+					exit;
+				}
+			}
+			else {
+				header("Last-Modified: ".gmdate("r", $dat)." GMT");
+			}
+			
 			if ( $type == "css" OR $type == "js" ) {
 				ob_start();
 				eval("?>$code<?php\r\n");
