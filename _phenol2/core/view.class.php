@@ -333,6 +333,14 @@ class View {
 			ob_end_clean();
 		}
 		
+		// Перевод
+		$vals = (array)$this->registry->locale->getAllArray();
+		foreach ( $vals as $var => $value )
+		{
+			if ( !is_int( $value ) && !is_float($value) && !is_string($value) ) continue;
+			$sourcecode = str_replace( "{_" . $var . "}", $value, $sourcecode );
+		}				
+		
 		// Удаление комментариев в шаблоне
 		$sourcecode = preg_replace("/({\;.*?})/", "", $sourcecode);
 		$sourcecode = preg_replace("/^(;;.*?\r\n)/m", "", $sourcecode);

@@ -1,0 +1,55 @@
+* {
+	margin: 0;
+	padding: 0;
+	outline: 0;
+	font-family: Ubuntu;
+}
+
+.breadcrumbs {
+	display: block;
+	background-color: #e8e8e8;
+	padding: 10px 20px;
+	border-bottom: 1px solid #d6d6d6;
+	cursor: default;
+	font-size: 18px;
+	color: #999;
+}
+
+.breadcrumbs a {
+	color: #000;
+	text-decoration: none;
+	border-bottom: 1px solid transparent;
+	transition: all .25s;
+}
+
+.breadcrumbs a:hover {
+	border-color: #000;
+}
+
+.breadcrumbs span {
+	color: #777;
+}
+
+.content {
+	margin-top: 10px;
+	padding: 20px;
+	box-sizing: border-box;
+}
+
+.menu {
+	font-size: 16px;
+	padding: 20px 30px;
+}
+
+.menu a {
+	
+}
+
+.box {
+	
+}
+
+
+
+
+
