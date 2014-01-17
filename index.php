@@ -16,7 +16,7 @@ if ( $subdomain ) {
 else
 {
 	// Запуск стандартного пакета
-	$phenol->detector->setPackage("lestad");
+	$phenol->detector->setPackage("default");
 }
 
 

@@ -2,10 +2,10 @@
 
 # Настройки сервера
 [Server]
-Domain		= "phenol2.com"
+Domain		= "site.phenol2.com"
 
 [Aliases]
-default		= ["example", "phenol2.lestad.net"]
+#default		= ["example", "phenol2.lestad.net"]
 
 # Настройки кэширования в сек
 [Cache]
