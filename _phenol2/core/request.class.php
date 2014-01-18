@@ -29,8 +29,6 @@ final class Request
 		$this->cookie = $_COOKIE;
 		$this->session = &$_SESSION;
 	}
-	
-	
 }
 
 

@@ -152,7 +152,7 @@ final class Detector extends \System\EngineBlock
 		$class = createClassname($classname, 'Package');
 		$this->registry->package = new $class($this->registry);
 		$this->registry->package->ConfigLoad();
-		$this->registry->package->onRun( $this->request->arguments = $this->detector->getArguments() );
+		$this->registry->package->onRun( $this->detector->getArguments() );
 	}
 	
 		
@@ -171,7 +171,7 @@ final class Detector extends \System\EngineBlock
 		}
 		elseif ( count($arguments) == 1 )
 		{
-			$this->load->controller('common/'.$arguments[0]);
+			$this->load->controller($arguments[0].'/default');
 			$this->controller->fireAction('default');
 		}
 		elseif ( count($arguments) == 2 )
@@ -203,6 +203,13 @@ final class Detector extends \System\EngineBlock
 			if ( $arg == '' || $arg == null ) continue;
 			$arguments[] = $arg;
 		}
+		
+		$this->request->arguments = array();
+		if ( count($arguments) > 3 ) {
+			$cc = count($arguments);
+			for ( $i = 3; $i < $cc; $i++ ) $this->request->arguments[] = $arguments[$i];
+		}
+		
 		return $arguments;
 	}
 	

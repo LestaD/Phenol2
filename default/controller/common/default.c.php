@@ -10,6 +10,9 @@ class CCommonDefault extends Controller
 		
 		$this->view->v->foo = $test['foo'];
 		
+		$this->view->v->arguments = $this->request->arguments;
+		$this->view->v->get = $this->request->get;
+		
 		$this->view->template = "body";
 		$this->view->render();
 	}
