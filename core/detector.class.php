@@ -245,7 +245,7 @@ final class Detector extends \System\EngineBlock
 		$file = $info['dirname'] . DS . $info['basename'];
 		
 		// Путь к запущенному пакету
-		$package = str_replace('%package%', $this->default_package, $this->search_path);
+		$package = str_replace('%package%', $this->default_package, $this->search_path) . DS . "resource";
 		
 		$mime = '';
 		$accept = false;
