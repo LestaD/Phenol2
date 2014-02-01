@@ -21,12 +21,16 @@ final class Detector extends \System\EngineBlock
 	private $load_package = false;
 	private $request_uri;
 	private $language = false;
+	private $subdomain = false;
 	
 	public function __construct( &$registry )
 	{
 		parent::__construct( $registry );
 		$this->search_path = DIR_ROOT . 'package_%package%';
-		$this->request_uri = $_SERVER['REQUEST_URI'];
+		
+		$uri = explode("#", $_SERVER['REQUEST_URI']);
+		
+		$this->request_uri = $uri[0];
 		
 		$this->language = $this->userLanguage();
 		
@@ -58,6 +62,10 @@ final class Detector extends \System\EngineBlock
 	 */
 	public function getCurrentSubdomain()
 	{
+		if ( $this->subdomain ) {
+			return $this->subdomain;
+		}
+		
 		$host = $_SERVER['HTTP_HOST'];
 		$domain = $this->registry->fconfig->Server['Domain'];
 		if ( $host == $domain )
@@ -66,8 +74,7 @@ final class Detector extends \System\EngineBlock
 		}
 		else
 		{
-			$host = str_replace('.'.$domain, '', $host);
-			return $host;
+			return $this->subdomain = str_replace('.'.$domain, '', $host);
 		}
 		
 	}
@@ -148,6 +155,7 @@ final class Detector extends \System\EngineBlock
 		$this->cache = new Cache($this->registry);
 		$this->locale = new Locale($this->registry);
 		$this->view = new View($this->registry);
+		$this->v = $this->view->v;
 		
 		$class = createClassname($classname, 'Package');
 		$this->registry->package = new $class($this->registry);
@@ -164,27 +172,56 @@ final class Detector extends \System\EngineBlock
 	 */
 	public function runControllerScheme( array $arguments )
 	{
-		if ( count($arguments) == 0 )
+		$count = count($arguments);
+		if ( $count == 0 )
 		{
 			$this->load->controller('common/default');
 			$this->controller->fireAction('default');
 		}
-		elseif ( count($arguments) == 1 )
+		elseif ( $count == 1 )
 		{
 			$this->load->controller($arguments[0].'/default');
 			$this->controller->fireAction('default');
 		}
-		elseif ( count($arguments) == 2 )
+		elseif ( $count == 2 )
 		{
 			$this->load->controller($arguments[0].'/'.$arguments[1]);
 			$this->controller->fireAction('default');
 		}
-		elseif ( count($arguments) > 2 )
+		elseif ( $count > 2 )
 		{
 			$this->load->controller($arguments[0].'/'.$arguments[1]);
 			$this->controller->fireAction($arguments[2]);
 		}
 	}
+	
+	
+		
+	/**
+	 * Контроллер должен иметь интерфейс UserService
+	 * метод preAction() вызывается перед запуском любых Action
+	 * 
+	 * @return void
+	 */
+	public function dispatchPreActionEvents() {
+		if ( is_subclass_of($this->registry->controller, "UserService") ) {
+			$this->registry->controller->preAction();
+		}
+	}
+	
+		
+	/**
+	 * Контроллер должен иметь интерфейс UserService
+	 * метод afterAction() вызывается перед самым рендерингом страницы
+	 * 
+	 * @return void
+	 */
+	public function dispatchAfterActionEvents() {
+		if ( is_subclass_of($this->registry->controller, "UserService") ) {
+			$this->registry->controller->afterAction();
+		}
+	}
+	
 	
 		
 	/**

@@ -1,6 +1,6 @@
 <?php
 define( 'ENGINE',			'Phenol');
-define( 'VERSION',			'2.0.5' );
+define( 'VERSION',			'2.0.6' );
 
 define( 'DS',				'/' );
 define( 'DIR_ENGINE',		dirname(__FILE__) . DS );
@@ -9,6 +9,7 @@ define( 'DIR_CORE',			DIR_ENGINE . 'core' . DS );
 define( 'DIR_SYSTEM',		DIR_ENGINE . 'system' . DS );
 define( 'DIR_LIBRARY',		DIR_ENGINE . 'library' . DS );
 define( 'DIR_DRIVER',		DIR_ENGINE . 'driver' . DS );
+define( 'DIR_INTERFACE',	DIR_SYSTEM . 'interface' . DS );
 
 include DIR_SYSTEM . 'error.class.php';
 include DIR_SYSTEM . 'engineblock.class.php';
@@ -96,8 +97,32 @@ function write_ini_file($array, $file)
 }
 
 
+class Ph {
+	
+	static public function import( $path ) {
+		list($type, $data) = explode('.', $path, 2);
+		switch($type) {
+			case 'interface':
+				Ph::_impInterface($data);
+				break;
+			
+			default:
+				// Make error!!!
+		}
+	}
+	
+	private function _impInterface( $p ) {
+		$path = DIR_INTERFACE . $p . '.php';
+		if ( file_exists( $path ) ) {
+			require $path;
+		} else {
+			die('<br><b>Fatal error</b>: interface file not found: <b>'.$path.'</b> <br>');
+		}
+	}
+	
+}
 
-
+// is_subclass_of()
 
 
 

@@ -20,6 +20,7 @@ abstract class Controller extends \System\EngineBlock
 		$target = createClassname($action, 'Action');
 		if ( is_callable(array(&$this, $target)) )
 		{
+			$this->registry->detector->dispatchPreActionEvents();
 			call_user_func_array(array(&$this, $target),array());
 		}
 		else
