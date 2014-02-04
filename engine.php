@@ -1,6 +1,6 @@
 <?php
 define( 'ENGINE',			'Phenol');
-define( 'VERSION',			'2.0.6' );
+define( 'VERSION',			'2.0.7' );
 
 define( 'DS',				'/' );
 define( 'DIR_ENGINE',		dirname(__FILE__) . DS );
@@ -99,27 +99,39 @@ function write_ini_file($array, $file)
 
 class Ph {
 	
+	
+	/**
+	 * Импорт библиотек и других системных файлов
+	 * 
+	 * @param mixed $path
+	 * @return void
+	 */
 	static public function import( $path ) {
 		list($type, $data) = explode('.', $path, 2);
+		
+		$file = '';
+		$error = '';
 		switch($type) {
 			case 'interface':
-				Ph::_impInterface($data);
+				$file = DIR_INTERFACE . $data . '.php';
+				$error = 'interface file not found';
+				break;
+			
+			case 'library':
+				$file = DIR_LIBRARY . str_replace('.', '/', $data) . '.php';
+				$error = 'library not found';
 				break;
 			
 			default:
 				// Make error!!!
 		}
-	}
-	
-	private function _impInterface( $p ) {
-		$path = DIR_INTERFACE . $p . '.php';
-		if ( file_exists( $path ) ) {
-			require $path;
+		
+		if ( file_exists($file) ) {
+			require $file;
 		} else {
-			die('<br><b>Fatal error</b>: interface file not found: <b>'.$path.'</b> <br>');
+			die('<br><b>Fatal error</b>: '.$error.': <b>'.$path.'</b> <br>');
 		}
 	}
-	
 }
 
 // is_subclass_of()
