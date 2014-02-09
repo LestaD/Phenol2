@@ -50,7 +50,23 @@ abstract class Controller extends \System\EngineBlock
 	}
 	
 	
-	
+	protected function sub($controller)
+	{
+		if ( isset($this->registry->subctr->{$controller}) ) {
+			return $this->registry->subctr->{$controller};
+		}
+		
+		Ph::import('controller.'.str_replace('/', '.', $controller));
+		$class = createClassname($controller, 'C');
+		
+		if ( class_exists($class) ) {
+			return $this->subctr->{$controller} = new $class($this->registry);
+		} else {
+			return FALSE;
+		}
+		
+		return FALSE;
+	}
 	
 }
 

@@ -1,6 +1,6 @@
 <?php
 define( 'ENGINE',			'Phenol');
-define( 'VERSION',			'2.0.7' );
+define( 'VERSION',			'2.0.8' );
 
 define( 'DS',				'/' );
 define( 'DIR_ENGINE',		dirname(__FILE__) . DS );
@@ -43,6 +43,9 @@ $phenol->fconfig = (object)\Toml\Parser2::fromFile(DIR_ROOT . 'config.toml');
 
 // Детектор пакетов
 $phenol->detector = new Core\Detector($phenol);
+
+// Для дополнительных контроллеров
+$phenol->subctr = new Core\Registry;
 
 // Загрузчик моделей, контроллеров
 include DIR_CORE . 'loader.class.php';
@@ -98,7 +101,7 @@ function write_ini_file($array, $file)
 
 
 class Ph {
-	
+	private static $imported = array();
 	
 	/**
 	 * Импорт библиотек и других системных файлов
@@ -107,6 +110,11 @@ class Ph {
 	 * @return void
 	 */
 	static public function import( $path ) {
+		
+		if ( isset( self::$imported[$path] ) ) {
+			return;
+		}
+		
 		list($type, $data) = explode('.', $path, 2);
 		
 		$file = '';
@@ -122,12 +130,18 @@ class Ph {
 				$error = 'library not found';
 				break;
 			
+			case 'controller':
+				$file = DIR_PACKAGE . 'controller/' . str_replace('.', '/', $data) . '.c.php';
+				$error = 'controller not found';
+				break;
+			
 			default:
 				// Make error!!!
 		}
 		
 		if ( file_exists($file) ) {
 			require $file;
+			self::$imported[$path] = $path;
 		} else {
 			die('<br><b>Fatal error</b>: '.$error.': <b>'.$path.'</b> <br>');
 		}

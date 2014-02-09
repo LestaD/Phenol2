@@ -298,17 +298,6 @@ class ViewBase {
 	public function dispatch( $effectsclass ) {
 		if ( $this->error ) return;
 		
-		function run ( &$_sc, $_c, $_d, &$view ) {
-			extract( $_d );
-			ob_start();
-			
-			eval("?>$_c<?php\r\n");
-			
-			$_sc = ob_get_contents();
-			ob_end_clean();
-		}
-		
-		
 		$code = $this->template != false ? $this->ReadTemplate( $this->folder . $this->template . '.tpl' ) : $this->code;
 		
 		// Врезка дочерних шаблонов
@@ -337,7 +326,7 @@ class ViewBase {
 		
 		$sourcecode = "";
 		
-		run( $sourcecode, $code, $all, $this );
+		$this->run( $sourcecode, $code, $all, $this );
 		
 		// Перевод
 		$vals = (array)$this->registry->locale->getAllArray();
@@ -356,10 +345,20 @@ class ViewBase {
 		// Удаление комментариев в шаблоне
 		$sourcecode = preg_replace("/({\;.*?})/", "", $sourcecode);
 		$sourcecode = preg_replace("/^(;;.*?\r\n)/m", "", $sourcecode);
-		$sourcecode = preg_replace("/{\$.*?}/", '', $sourcecode);
+		$sourcecode = preg_replace("/{[\$].*?}/", '', $sourcecode);
 		$sourcecode = preg_replace("/{_.*?}/", '', $sourcecode);
 		
 		return $sourcecode;
+	}
+	
+	private function run ( &$_sc, $_c, $_d, &$view ) {
+		extract( $_d );
+		ob_start();
+		
+		eval("?>$_c<?php\r\n");
+		
+		$_sc = ob_get_contents();
+		ob_end_clean();
 	}
 	
 	
