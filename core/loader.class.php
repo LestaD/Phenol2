@@ -17,6 +17,7 @@ namespace Core;
 final class Loader
 {
 	private $registry;
+	public $controller;
 	
 	public function __construct( &$registry )
 	{
@@ -42,6 +43,7 @@ final class Loader
 			include $fullpath;
 			if ( class_exists($classname) )
 			{
+				$this->controller = $path;
 				$this->registry->controller = new $classname($this->registry);
 				return true;
 			}

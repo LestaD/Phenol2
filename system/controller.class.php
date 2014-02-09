@@ -3,7 +3,7 @@
 
 abstract class Controller extends \System\EngineBlock
 {
-	public function getName()
+	public function getClass()
 	{
 		return get_class($this);
 	}
@@ -29,6 +29,9 @@ abstract class Controller extends \System\EngineBlock
 		}
 	}
 	
+	public function getName() {
+		return $this->load->controller;
+	}
 	
 	
 	/**
