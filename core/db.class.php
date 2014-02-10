@@ -55,6 +55,10 @@ final class Database extends \System\EngineBlock
 	 */
 	public function init( $drivername = null, $host = null, $user = null, $pass = null, $dbase = null, $encoding = false )
 	{
+		if ( $driver !== null ) {
+			return;
+		}
+		
 		if ( $drivername == null ) {
 			$drivername = $this->config->driver;
 			$host = $this->config->db_host;
@@ -64,21 +68,25 @@ final class Database extends \System\EngineBlock
 			$encoding = $encoding ?: $this->config->db_encode;
 		}
 		
-		if ( file_exists(DIR_DRIVER . $drivername . '.php') && is_file( DIR_DRIVER . $drivername . '.php' ) )
-		{
-			include DIR_DRIVER . $drivername . '.php';
-			$classname = $drivername;
-			$classname{0} = strtoupper($classname{0});
-			$classname = 'Driver'.$classname;
-			$this->driver = new $classname($host, $user, $pass, $dbase);
-			if ( $encoding !== false )
+		$classname = $drivername;
+		$classname{0} = strtoupper($classname{0});
+		$classname = 'Driver'.$classname;
+		
+		if ( !class_exists($classname) ) {
+			if ( file_exists(DIR_DRIVER . $drivername . '.php') && is_file( DIR_DRIVER . $drivername . '.php' ) )
 			{
-				$this->driver->encoding($encoding);
+				include DIR_DRIVER . $drivername . '.php';
+				
+				$this->driver = new $classname($host, $user, $pass, $dbase);
+				if ( $encoding !== false )
+				{
+					$this->driver->encoding($encoding);
+				}
 			}
-		}
-		else
-		{
-			$this->error->errorDriverLoad($drivername);
+			else
+			{
+				$this->error->errorDriverLoad($drivername);
+			}
 		}
 	}
 	
