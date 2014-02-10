@@ -14,7 +14,9 @@ class Writer
 		
 		foreach ( $input as $key=>$val ) {
 			if ( is_array($val) || is_object($val) ) {
-				if ( is_assoc( (array)$val ) ) {
+				$val = (array)$val;
+				$first = reset($val);
+				if ( is_assoc( (array)$val ) || is_array($first) || is_object($first) ) {
 					$this->loop($key, (array)$val);
 				} else {
 					$this->glob[$key] = $val;
@@ -32,7 +34,9 @@ class Writer
 	{
 		foreach ( $data as $key=>$val ) {
 			if ( is_array($val) || is_object($val) ) {
-				if ( is_assoc( (array)$val ) ) {
+				$val = (array)$val;
+				$first = reset($val);
+				if ( is_assoc( $val ) || is_array($first) || is_object($first) ) {
 					$this->loop($target.'.'.$key, $val);
 				} else {
 					$this->categories[$target][$key] = $val;

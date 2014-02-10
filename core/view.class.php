@@ -41,21 +41,23 @@ namespace Core {
 		 * @param string $template
 		 * @return void
 		 */
-		public function generateListByArray( $template, array $array )
+		public function generateListByArray( $template, $array )
 		{
 			$code = '';
-			if ( count($array) > 0 ) {
-				foreach ( $array as $item ) {
-					if ( is_array($item) ) {
-						$counter = 1;
-						$curtpl = $template . '';
-						foreach ( $item as $id=>$val ) {
-							$curtpl = str_replace('%'.$counter, $val, $curtpl);
-							$counter++;
+			if ( is_array( $array ) ) {
+				if ( count($array) > 0 ) {
+					foreach ( $array as $item ) {
+						if ( is_array($item) ) {
+							$counter = 1;
+							$curtpl = $template . '';
+							foreach ( $item as $id=>$val ) {
+								$curtpl = str_replace('%'.$counter, $val, $curtpl);
+								$counter++;
+							}
+							$code .= $curtpl;
+						} else {
+							$code .= str_replace('%1', $item, $template);
 						}
-						$code .= $curtpl;
-					} else {
-						$code .= str_replace('%1', $item, $template);
 					}
 				}
 			}
