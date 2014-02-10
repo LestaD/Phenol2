@@ -34,7 +34,7 @@ final class DriverMysqli {
 		$this->link->real_query("SET NAMES $encoding");
 		$this->link->set_charset($encoding);
   	}
-		
+  	
   	public function query($sql) {
   		
   		$ret = $this->link->real_query($sql);
@@ -77,7 +77,7 @@ final class DriverMysqli {
 			print_r($resource);
 			echo "</pre>";
 			
-			trigger_error('Error: ' . $this->link->connect_error . '<br />Error No: ' . $this->link->connect_errno . '<br />SQL: <pre>' . $sql . '</pre>');
+			trigger_error('Error: ' . $this->link->connect_error . '<br />Error No: ' . $this->link->connect_errno . '<br /> '.$this->link->error.' SQL: <pre>' . $sql . '</pre>');
 			exit();
     	}
   	}

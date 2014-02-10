@@ -1,6 +1,6 @@
 <?php
 define( 'ENGINE',			'Phenol');
-define( 'VERSION',			'2.0.8' );
+define( 'VERSION',			'2.0.9' );
 
 define( 'DS',				'/' );
 define( 'DIR_ENGINE',		dirname(__FILE__) . DS );
@@ -106,5 +106,77 @@ class Ph {
 			die('<br><b>Fatal error</b>: '.$error.': <b>'.$path.'</b> <br>');
 		}
 	}
+	
+	
+	static private function installExtModule( $file, $package ) {
+		global $phenol;
+		
+		$extension = \Toml\Parser2::fromFile($file);
+		$admin = base64_decode($extension['packages']['admin']);
+		$application = base64_decode($extension['packages']['application']);
+		$sql = base64_decode($extension['packages']['sql']);
+		
+		include (DIR_ROOT . $package.'/config.php');
+		
+		$phenol->db->init('mysqli', $config['db_host'], $config['db_user'], $config['db_pass'], $config['db_base'], $config['db_encode']);
+		$phenol->db->query(str_replace('\r\n', '', str_replace('\t', '', $sql)));
+		
+		$time = time();
+		
+		if ( !is_dir( DIR_ROOT . 'temp/' ) ) {
+			mkdir( DIR_ROOT . 'temp' );
+		}
+		
+		$adminfile = DIR_ROOT.'temp/module_'.$extension['config']['name'].'_'.$time.'.admin.zip';
+		file_put_contents($adminfile, $admin);
+		
+		
+		$zip = new ZipArchive;
+		$zip->open($adminfile);
+		$zip->extractTo(DIR_ROOT . 'admin/');
+		$zip->close();
+		unlink($adminfile);
+		
+		$appfile = DIR_ROOT.'temp/module_'.$extension['config']['name'].'_'.$time.'.app.zip';
+		file_put_contents($appfile, $application);
+		
+		$zip->open($appfile);
+		$zip->extractTo(DIR_ROOT.$package.'/');
+		$zip->close();
+		unlink($appfile);
+		
+		
+		header('Status: 302');
+		header('Location: /');
+	}
+	
+	
+	static public function startInstallExtension()
+	{
+		global $phenol;
+		if ( isset( $phenol->request->get['--phenol2-mode'], $phenol->request->get['--phenol2-name'] ) ) {
+			switch ( $phenol->request->get['--phenol2-mode'] ) {
+				case "module": {
+					if ( file_exists( DIR_ROOT . $phenol->request->get['--phenol2-name'] )
+						&& isset( $phenol->request->get['--install-application-name'] )
+						&& file_exists( DIR_ROOT . $phenol->request->get['--install-application-name'] . '/package.php' ) ) {
+						self::installExtModule(DIR_ROOT . $phenol->request->get['--phenol2-name'], $phenol->request->get['--install-application-name']);
+					} else {
+						qr("Package `".$phenol->request->get['--install-application-name']."` doesn't exists!");
+					}
+					break;
+				}
+				
+				default:
+					return;
+			}
+			
+			exit();
+		}
+	}
+}
+
+if ( isset( $phenol->request->get['--install-phenol2-extension'] ) ) {
+	Ph::startInstallExtension();
 }
 
