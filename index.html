@@ -82,7 +82,7 @@ $phenol-&gt;detector-&gt;runPackage();
         $this-&gt;fconfig-&gt;i['user_language'] = $this-&gt;detector-&gt;LanguageMatchBest(array(
             'ru' =&gt; array('ru', 'be', 'uk', 'ky', 'ab', 'mo', 'et', 'lv'),
         ), $this-&gt;fconfig-&gt;i['default_language']);
-        $this-&gt;locale-&gt;folder = DIR_PACKAGE . 'language' . DS;
+        $this-&gt;locale-&gt;folder = DIR_PACKAGE . 'i18n' . DS;
         $this-&gt;locale-&gt;setLanguage($this-&gt;fconfig-&gt;i['user_language']);
         $this-&gt;locale-&gt;add('common');
         $this-&gt;view-&gt;folder = DIR_PACKAGE . 'view' . DS;
