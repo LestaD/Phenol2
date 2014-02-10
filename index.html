@@ -13,13 +13,13 @@
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
-    <title>Phenol2 Controller by LestaD</title>
+    <title>Phenol2 by LestaD</title>
   </head>
 
   <body>
     <header>
       <div class="inner">
-        <h1>Phenol2 Controller</h1>
+        <h1>Phenol2</h1>
         <h2></h2>
         <a href="https://github.com/LestaD/Phenol2" class="button"><small>View project on</small>GitHub</a>
       </div>
@@ -37,24 +37,35 @@ Phenol2 находится в постоянном развитии.</p>
 <p>Запуск движка с последующим запуском приложений:</p>
 
 <pre><code>&lt;?php
+if ( version_compare( PHP_VERSION, "5.3.0", "&lt;" ) ) { exit( "PHP version must be higher than 5.3"); }
 require '../Phenol2/engine.php';
 
+// Поиск пакетов приложений будет производиться в папке
 $phenol-&gt;detector-&gt;searchPackagesIn(dirname(__FILE__).DS.'%package%'.DS);
-$phenol-&gt;detector-&gt;default_package = "default";
 
+$phenol-&gt;detector-&gt;default_package = "unknown";
+
+// Определение текущего домена
 $subdomain = $phenol-&gt;detector-&gt;getCurrentSubdomain();
 if ( $subdomain ) {
+    // Запуск пакета по имени домена
     $phenol-&gt;detector-&gt;setPackage($phenol-&gt;detector-&gt;detectAlias($subdomain));
 }
 else
 {
-    $phenol-&gt;detector-&gt;setPackage("default");
+    // Запуск стандартного пакета
+    $phenol-&gt;detector-&gt;setPackage("application");
 }
 
+// Если был запрошен файл, а не адрес
 if ( $phenol-&gt;detector-&gt;isFileRequested() ) {
+
+    // Запрашиваем вывод файла или системную ошибку
     $phenol-&gt;detector-&gt;getFileRequested();
     die();
 }
+
+// Запуск выбранного пакета
 $phenol-&gt;detector-&gt;runPackage();
 </code></pre>
 
@@ -117,11 +128,11 @@ $config = array
 <ul>
 <li>cache</li>
 <li>controller</li>
-<li>i18n</li>
+<li>language</li>
 <li>model</li>
 <li>resource</li>
 <li>view</li>
-</ul><p><code>cache</code> - папка сохранения кэше запросов к базе данных.<br><code>controller</code> - здесь располагаются все контроллеры пакета<br><code>i18n</code> - директория с файлами перевода<br><code>model</code> - модели базы данных<br><code>resource</code> - корень пакета доступного извне<br><code>view</code> - папка с шаблонами<br></p>
+</ul><p><code>cache</code> - папка сохранения кэше запросов к базе данных.<br><code>controller</code> - здесь располагаются все контроллеры пакета<br><code>language</code> - директория с файлами перевода<br><code>model</code> - модели базы данных<br><code>resource</code> - корень пакета доступного извне<br><code>view</code> - папка с шаблонами<br></p>
         </section>
 
         <aside id="sidebar">
