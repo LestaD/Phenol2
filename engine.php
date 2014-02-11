@@ -1,6 +1,8 @@
 <?php
+if ( version_compare( PHP_VERSION, "5.3.0", "<" ) ) { exit( "PHP version must be higher than 5.3"); }
+
 define( 'ENGINE',			'Phenol');
-define( 'VERSION',			'2.0.9' );
+define( 'VERSION',			'2.1.0' );
 
 define( 'DS',				'/' );
 define( 'DIR_ENGINE',		dirname(__FILE__) . DS );
@@ -27,40 +29,156 @@ include DIR_CORE . 'config.class.php';
 
 include DIR_LIBRARY . 'Toml/Parse.php';
 
-$phenol = new Core\Registry;
-
-// 
-$phenol->error = new Core\Phenol2ErrorListener($phenol);
-
-// Все массивы с результатами запроса находятся в этом объекте
-$phenol->request = new Core\Request();
-
-// Конфигурация пакета
-$phenol->config = new Core\Config();
-
-// Парсинг системных настроек
-$phenol->fconfig = (object)\Toml\Parser2::fromFile(DIR_ROOT . 'config.toml');
-
-// Детектор пакетов
-$phenol->detector = new Core\Detector($phenol);
-
-// Для дополнительных контроллеров
-$phenol->subctr = new Core\Registry;
-
-// Загрузчик моделей, контроллеров
-include DIR_CORE . 'loader.class.php';
-$phenol->load = new Core\Loader($phenol);
-
-// 
-include DIR_CORE . 'crypt.class.php';
-$phenol->crypt = new Core\Crypt;
-
-// Объект для работы с базой данных
-include DIR_CORE . 'db.class.php';
-$phenol->db = new Core\Database( $phenol );
-
 
 class Ph {
+	/**
+	 * Запуск приложения с указанными настройками
+	 * 
+	 * @param mixed $config
+	 * @return void
+	 */
+	static public function runApplication( $config )
+	{
+		$application = new self;
+		$application->configurate(\Toml\Parser2::fromFile($config));
+		$package = $application->detectPackage();
+		$application->runPackage( $package );
+	}
+	
+	private $phenol;
+	
+	
+	/**
+	 * Конструктор
+	 * 
+	 * @return void
+	 */
+	private function __construct()
+	{
+		$this->phenol = new Core\Registry;
+
+		// 
+		$this->phenol->error = new Core\Phenol2ErrorListener($this->phenol);
+		
+		// Все массивы с результатами запроса находятся в этом объекте
+		$this->phenol->request = new Core\Request();
+	}
+	
+	/**
+	 * Конфигурация приложения
+	 * 
+	 * @param mixed $data
+	 * @return void
+	 */
+	private function configurate( $data )
+	{
+		// Конфигурация пакета
+		$this->phenol->config = new Core\Config();
+		
+		// Парсинг системных настроек
+		$this->phenol->fconfig = (object)$data;
+		
+		// Детектор пакетов
+		$this->phenol->detector = new Core\Detector($this->phenol);
+		
+		// Для дополнительных контроллеров
+		$this->phenol->subctr = new Core\Registry;
+		
+		// Загрузчик моделей, контроллеров
+		include DIR_CORE . 'loader.class.php';
+		$this->phenol->load = new Core\Loader($this->phenol);
+		
+		// 
+		include DIR_CORE . 'crypt.class.php';
+		$this->phenol->crypt = new Core\Crypt;
+		
+		// Объект для работы с базой данных
+		include DIR_CORE . 'db.class.php';
+		$this->phenol->db = new Core\Database( $this->phenol );
+	}
+	
+	/**
+	 * Определение пакета
+	 * 
+	 * @return void
+	 */
+	private function detectPackage()
+	{
+		$this->checkConfig();
+		$package = FALSE;
+		$commondomain = $this->phenol->fconfig->Server['Domain'];
+		$subdomain = $this->phenol->detector->getCurrentSubdomain();
+		$aliasonly = strtolower($this->phenol->fconfig->Server['AliasOnly']) == "true" ? true : false;
+		$defaultpackage = $this->phenol->fconfig->Server['DefaultPackage'];
+		$aliaspackage = $this->phenol->detector->detectAlias($commondomain);
+		
+		// Если для адреса есть алиас
+		if ( $aliaspackage->package )
+		{
+			$package = $aliaspackage->package;
+			$this->phenol->detector->request_uri = $aliaspackage->uri;
+			$this->phenol->detector->baseuri = '//'.$aliaspackage->domain;
+		} else {
+			// Если указана загрузка пакетов напрямую
+			if ( !$aliasonly && $subdomain )
+			{
+				$package = $subdomain;
+			} else {
+				// Если загружается основной домен
+				if ( $commondomain == $_SERVER['HTTP_HOST'] )
+				{
+					$package = $defaultpackage;
+				}
+			}
+		}
+		return $package;
+	}
+	
+	/**
+	 * Проверка корректности настроек
+	 * 
+	 * @return void
+	 */
+	private function checkConfig()
+	{
+		if ( !isset($this->phenol->fconfig->Server['Domain']) ) {
+			qrd("ERROR!\r\n\r\n[Server]\r\nDomain = \"\"");
+		}
+		
+		if ( !isset($this->phenol->fconfig->Server['AliasOnly']) ) {
+			qrd("ERROR!\r\n\r\n[Server]\r\nAliasOnly = \"\"");
+		}
+		
+		if ( !isset($this->phenol->fconfig->Server['DefaultPackage']) ) {
+			qrd("ERROR!\r\n\r\n[Server]\r\nDefaultPackage = \"\"");
+		}
+	}
+	
+	/**
+	 * Запуск определенного пакета
+	 * 
+	 * @param mixed $package
+	 * @return void
+	 */
+	private function runPackage( $package )
+	{
+		$this->phenol->detector->searchPackagesIn(DIR_ROOT);
+		$this->phenol->detector->setPackage($package);
+		
+		// Если был запрошен файл, а не адрес
+		if ( $this->phenol->detector->isFileRequested() ) {
+			
+			// Запрашиваем вывод файла или системную ошибку
+			$this->phenol->detector->getFileRequested();
+			die();
+		}
+		
+		$this->phenol->detector->runPackage();
+	}
+	
+	
+	// ======================================================================================
+	
 	private static $imported = array();
 	
 	/**

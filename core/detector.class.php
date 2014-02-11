@@ -11,22 +11,24 @@ namespace Core;
  * @package Phenol2
  * @author LestaD
  * @copyright 2013
- * @version 1.1
+ * @version 1.4
  * @access public
  */
 final class Detector extends \System\EngineBlock
 {
-	public $default_package = 'www';
+	public $package_name = 'application'; // default_package
+	public $request_uri = '/';
+	public $baseuri = '';
 	private $search_path = '';
-	private $load_package = false;
-	private $request_uri;
 	private $language = false;
 	private $subdomain = false;
+	private $aliases;
 	
 	public function __construct( &$registry )
 	{
 		parent::__construct( $registry );
-		$this->search_path = DIR_ROOT . 'package_%package%';
+		
+		$this->aliases = array();
 		
 		$uri = explode("#", $_SERVER['REQUEST_URI']);
 		
@@ -34,10 +36,19 @@ final class Detector extends \System\EngineBlock
 		
 		$this->language = $this->userLanguage();
 		
+		// Выстраивание всех алиасов в единый список
+		if ( isset( $this->registry->fconfig->Aliases ) ) {
+			foreach ( $this->registry->fconfig->Aliases as $group => $alias ) {
+				foreach ( $alias as $a ) {
+					$this->aliases[$a] = $group;
+				}
+			}
+		}
 	}
 	
 	
 	/**
+	 * УСТАРЕЛО!!!
 	 * Установка пакета для подгрузки
 	 * 
 	 * @param string $packagepath Путь к пакету приложения
@@ -45,12 +56,8 @@ final class Detector extends \System\EngineBlock
 	 */
 	public function setPackage( $packagename )
 	{
-		$packagepath = str_replace('%package%', $packagename, $this->search_path);
-		if ( file_exists( $packagepath ) && is_dir( $packagepath ) )
-		{
-			$this->default_package = $packagename;
-			return true;
-		} else return false;
+		$this->package_name = $packagename;
+		define( 'DIR_PACKAGE',	$this->search_path . $packagename . DS );
 	}
 	
 	
@@ -96,23 +103,33 @@ final class Detector extends \System\EngineBlock
 	/**
 	 * Определение пакета по алиасу домена
 	 * 
-	 * @param string $domain - alias or real package
 	 * @return string - package
 	 */
-	public function detectAlias($domain)
+	public function detectAlias( $configdomain )
 	{
-		$uri = $_SERVER['HTTP_HOST'];
-		$packagepath = str_replace('%package%', $domain, $this->search_path);
-		if ( file_exists( $packagepath ) && is_dir( $packagepath ) ) {
-			return $domain;
-		} else {
-			foreach ( $this->registry->fconfig->Aliases as $p_name=>$p_data )
-			{
-				if ( in_array($domain, $p_data) ) {
-					return $p_name;
-				}
+		$realdomain = $_SERVER['HTTP_HOST'];
+		$requesturl = $_SERVER['REQUEST_URI'];
+		$fulluri = $realdomain . $requesturl;
+		$rpackage = FALSE;
+		$ralias = '';
+		
+		foreach( $this->aliases as $alias=>$package )
+		{
+			$al = str_replace('*', $configdomain, $alias);
+			$pos = stripos( $fulluri, $al );
+			if ( $pos !== FALSE && $pos == 0 ) {
+				$rpackage = $package;
+				$ralias = $al;
+				break;
 			}
 		}
+		
+		$result = (object)array();
+		$result->package = $rpackage;
+		$result->uri = str_replace($ralias, '', $fulluri);
+		$result->domain = $ralias;
+		
+		return $result;
 	}
 	
 	
@@ -123,30 +140,17 @@ final class Detector extends \System\EngineBlock
 	 * @param bool $package
 	 * @return void
 	 */
-	public function runPackage( $package = false )
+	public function runPackage()
 	{
-		if ( $package !== false ) {
-			$packagepath = str_replace('%package%', $package, $this->search_path);
-			$defaultpackage = $packagepath;
-		} else {
-			$packagepath = str_replace('%package%', $this->load_package, $this->search_path);
-			$defaultpackage = str_replace('%package%', $this->default_package, $this->search_path);
-		}
 		$file = '';
-		$classname = '';
-		if ( file_exists( $packagepath . DS . 'package.php' ) ) {
-			$file = $packagepath . DS . 'package.php';
-			$classname = $package ?: $this->load_package;
-		} elseif ( file_exists( $defaultpackage . DS . 'package.php' )  ) {
-			$file = $defaultpackage . DS . 'package.php';
-			$classname = $package ?: $this->default_package;
+		$classname = $this->package_name;
+		if ( file_exists( $this->search_path . $this->package_name . DS . 'package.php' ) ) {
+			$file = $this->search_path . $this->package_name . DS . 'package.php';
 		} else {
-			$this->registry->error->errorPackageLoad($package ?: $this->load_package, $package ?: $this->default_package);
+			$this->registry->error->errorPackageLoad($this->package_name, $classname);
 		}
 		
 		include $file;
-		
-		define( 'DIR_PACKAGE',	$defaultpackage );
 		
 		include DIR_CORE . 'cache.class.php';
 		include DIR_CORE . 'local.class.php';
@@ -232,7 +236,7 @@ final class Detector extends \System\EngineBlock
 	 */
 	public function getArguments( $startat = 0 )
 	{
-		list($args, $get) = explode('?', $_SERVER['REQUEST_URI']);
+		list($args, $get) = explode('?', $this->request_uri);
 		$args = explode('/', $args);
 		$arguments = array();
 		foreach( $args as $arg )
@@ -260,11 +264,7 @@ final class Detector extends \System\EngineBlock
 	{
 		
 		$uri = explode('?', $this->request_uri, 2);
-		
-		//qr($uri);
-		
 		$info = pathinfo($uri[0]);
-		
 		return isset( $info['extension'] );
 	}
 	
@@ -282,7 +282,7 @@ final class Detector extends \System\EngineBlock
 		$file = $info['dirname'] . DS . $info['basename'];
 		
 		// Путь к запущенному пакету
-		$package = str_replace('%package%', $this->default_package, $this->search_path) . DS . "resource";
+		$package = $this->search_path . $this->package_name . DS . "resource";
 		
 		$mime = '';
 		$accept = false;
@@ -310,6 +310,7 @@ final class Detector extends \System\EngineBlock
 			$code = file_get_contents($package . DS . $file);
 			header('Content-Type: ' . $mime, true);
 			
+			// Непонятная херня
 			$h304="HTTP/1.x 304 Not Modified";
 			$match = ""; $since = ""; $varr = array(); $varrvis = array();
 			if (array_key_exists("HTTP_HOST",$_ENV)) $varr =& $_ENV;
@@ -320,6 +321,7 @@ final class Detector extends \System\EngineBlock
 			$since = explode(";",$since);
 			$since = strtotime( trim($since[0] ));
 			
+			// Заголовочки
 			$etag = '"' . md5($code) . '"';
 			header('ETag: ' . $etag);
 			header('Cache-Control: public, max-age=3600');
@@ -347,14 +349,24 @@ final class Detector extends \System\EngineBlock
 			}
 			
 			if ( $type == "css" OR $type == "js" ) {
+				
 				ob_start();
 				eval("?>$code<?php\r\n");
 				$ss = ob_get_contents();
 				ob_clean();
-				echo $ss;
-			} else {
-				echo $code;
+				
+				include DIR_CORE .'viewbase.class.php';
+				$v = new \Core\ViewBase($this->registry);
+				$const = $v->constants();
+				foreach ( $const as $c => $val )
+				{
+					$ss= str_replace( "{" . $c . "}", $val, $ss );
+				}
+				
+				$code = $ss;
 			}
+			
+			echo $code;
 		}
 		else
 		{
@@ -425,6 +437,4 @@ final class Detector extends \System\EngineBlock
 		return $default;
 	}
 }
-
-
 

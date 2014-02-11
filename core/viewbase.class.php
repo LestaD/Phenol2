@@ -8,7 +8,7 @@ namespace Core;
  * @package Phenol2
  * @author LestaD
  * @copyright 2013
- * @version 1.0
+ * @version 1.4
  * @access public
  */
 class ViewBase {
@@ -272,7 +272,7 @@ class ViewBase {
 		}
 	}
 	
-	private function constants()
+	public function constants()
 	{
 		// Стандартные переменные
         $default = array();
@@ -284,6 +284,7 @@ class ViewBase {
         $default['AUTHOR'] = AUTHOR;
         $default['DOMAIN'] = $this->registry->fconfig->Server['Domain'];
         $default['SUBDOMAIN'] = $this->registry->detector->getCurrentSubdomain();
+        $default['PURI'] = $this->registry->detector->baseuri;
         
         return $default;
 	}

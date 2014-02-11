@@ -45,11 +45,17 @@ abstract class Controller extends \System\EngineBlock
 	protected function redirect( $url, $status = 302 )
 	{
 		header('Status: ' . $status);
-		header('Location: ' . str_replace(array('&amp;', "\n", "\r"), array('&', '', ''), $url));
+		header('Location: ' . $this->detector->baseuri . str_replace(array('&amp;', "\n", "\r"), array('&', '', ''), $url));
 		exit();
 	}
 	
 	
+	/**
+	 * Вызов любого постороннего класса по его пути
+	 * 
+	 * @param mixed $controller - путь класса (common/default)
+	 * @return
+	 */
 	protected function sub($controller)
 	{
 		if ( isset($this->registry->subctr->{$controller}) ) {
