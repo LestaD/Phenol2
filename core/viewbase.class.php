@@ -305,13 +305,6 @@ class ViewBase {
 		foreach ( $this->childsv as $var => $value )
 			$code = str_replace( "{\$" . $var . "}", $value, $code );
 		
-		// Чтение всех переменных и загрузка их в шаблон
-		$vals = (array)$this->values;
-		foreach ( $vals as $var => $value )
-		{
-			if ( !is_int( $value ) && !is_float($value) && !is_string($value) ) continue;
-			$code = str_replace( "{\$" . $var . "}", $value, $code );
-		}
 		
 		// Перевод
 		$vals = (array)$this->registry->locale->getAllArray();
@@ -321,9 +314,32 @@ class ViewBase {
 			$code = str_replace( "{_" . $var . "}", $value, $code );
 		}
 		
-		$all = array_merge((array)$this->values, $vals);
+		/*
+		$code = str_replace('{%', '<?', $code);
+		$code = str_replace('%}', '?>', $code);
+		*/
+		$code = str_replace('{if ', '<?if(', $code);
+		$code = str_replace(' then}', '){?>', $code);
+		$code = str_replace('{else}', '<?}else{?>', $code);
+		$code = str_replace('{endif}', '<?}?>', $code);
+		$code = str_replace('{elseif ', '<?else if(', $code);
+		$code = str_replace('{foreach ', '<?foreach(', $code);
+		$code = str_replace('{endforeach}', '<?}?>', $code);
+		$code = str_replace('{for ', '<?for(', $code);
+		$code = str_replace('{endfor}', '<?}?>', $code);
+		$code = str_replace('{break}', '<?break;?>', $code);
+		$code = str_replace('{continue}', '<?continue;?>', $code);
+		$code = str_replace('{while ', '<?while(', $code);
+		$code = str_replace('{endwhile}', '<?}?>', $code);
+		$code = str_replace('{die}', '<?die();?>', $code);
 		
+		$code = preg_replace('/{\$(.*?)}/','<?=\$$1?>', $code);
+		$code = preg_replace('/{=(.*?)}/','<?=$1?>', $code);
+		
+		$all = array_merge((array)$this->values, $vals);
 		$all['registry'] = $this->registry;
+		
+		//qrd($code);
 		
 		$sourcecode = "";
 		
