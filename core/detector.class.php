@@ -163,7 +163,7 @@ final class Detector extends \System\EngineBlock
 		
 		$class = createClassname($classname, 'Package');
 		$this->registry->package = new $class($this->registry);
-		$this->registry->package->ConfigLoad();
+		// $this->registry->package->ConfigLoad();
 		$this->registry->package->onRun( $this->detector->getArguments() );
 	}
 	

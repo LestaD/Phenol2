@@ -55,6 +55,8 @@ final class Database extends \System\EngineBlock
 	 */
 	public function init( $drivername = null, $host = null, $user = null, $pass = null, $dbase = null, $encoding = false )
 	{
+		$this->registry->package->ConfigLoad();
+		
 		if ( $driver !== null ) {
 			return;
 		}
