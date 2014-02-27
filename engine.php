@@ -1,13 +1,13 @@
 <?php
 if ( version_compare( PHP_VERSION, "5.3.0", "<" ) ) { exit( "PHP version must be higher than 5.3"); }
 
-define( 'ENGINE',			'Phenol');
-define( 'VERSION',			'2.1.0' );
+define( 'ENGINE',		'Phenol');
+define( 'VERSION',		'2.1.0' );
 
-define( 'DS',				'/' );
+define( 'DS',			'/' );
 define( 'DIR_ENGINE',		dirname(__FILE__) . DS );
-define( 'DIR_ROOT',			$_SERVER['DOCUMENT_ROOT'] . DS );
-define( 'DIR_CORE',			DIR_ENGINE . 'core' . DS );
+define( 'DIR_ROOT',		$_SERVER['DOCUMENT_ROOT'] . DS );
+define( 'DIR_CORE',		DIR_ENGINE . 'core' . DS );
 define( 'DIR_SYSTEM',		DIR_ENGINE . 'system' . DS );
 define( 'DIR_LIBRARY',		DIR_ENGINE . 'library' . DS );
 define( 'DIR_DRIVER',		DIR_ENGINE . 'driver' . DS );
