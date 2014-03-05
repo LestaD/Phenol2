@@ -2,7 +2,7 @@
 if ( version_compare( PHP_VERSION, "5.3.0", "<" ) ) { exit( "PHP version must be higher than 5.3"); }
 
 define( 'ENGINE',			'Phenol');
-define( 'VERSION',			'2.1.0' );
+define( 'VERSION',			'2.2.0' );
 
 define( 'DS',				'/' );
 define( 'DIR_ENGINE',		dirname(__FILE__) . DS );
