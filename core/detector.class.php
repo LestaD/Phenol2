@@ -1,7 +1,5 @@
 <?php
 
-namespace Core;
-
 /**
  * Detector
  * 
@@ -14,7 +12,7 @@ namespace Core;
  * @version 1.4
  * @access public
  */
-final class Detector extends \System\EngineBlock
+final class Detector extends EngineBlock
 {
 	public $package_name = 'application'; // default_package
 	public $request_uri = '/';

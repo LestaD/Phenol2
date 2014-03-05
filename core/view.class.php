@@ -1,7 +1,5 @@
 <?php
-namespace Core {
-	
-	include DIR_CORE . "viewbase.class.php";
+include DIR_CORE . "viewbase.class.php";
 	
 	class View extends ViewBase {
 		
@@ -82,6 +80,3 @@ namespace Core {
 			echo $this->dispatch($this);
 		}
 	}
-	
-
-}

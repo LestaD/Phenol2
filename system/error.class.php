@@ -1,8 +1,5 @@
 <?php
 
-namespace System;
-
-
 abstract class ErrorListener
 {
 	

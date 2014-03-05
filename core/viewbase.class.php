@@ -1,7 +1,4 @@
 <?php
-
-namespace Core;
-
 /**
  * View
  * 

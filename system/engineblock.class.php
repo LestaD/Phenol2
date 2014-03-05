@@ -1,8 +1,5 @@
 <?php
 
-namespace System;
-
-
 /**
  * EngineBlock - используется как основа классов ядра
  * 

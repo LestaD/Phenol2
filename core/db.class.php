@@ -1,6 +1,4 @@
 <?php
-namespace Core;
-
 /**
  * Database
  * 
@@ -10,7 +8,7 @@ namespace Core;
  * @version 0.5
  * @access public
  */
-final class Database extends \System\EngineBlock
+final class Database extends EngineBlock
 {
 	private $link;
 	public $driver;

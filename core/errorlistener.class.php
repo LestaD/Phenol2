@@ -1,7 +1,5 @@
 <?php
 
-namespace Core;
-
 /**
  * Phenol2ErrorListener
  * 
@@ -14,7 +12,7 @@ namespace Core;
  * @version 1
  * @access public
  */
-class Phenol2ErrorListener extends \System\ErrorListener
+class Phenol2ErrorListener extends ErrorListener
 {
 	protected $registry;
 	

@@ -2,10 +2,6 @@
 /**
  * @package Core
 */
-
-namespace Core;
-
-
 /**
  * Управление картой значений
  * 
