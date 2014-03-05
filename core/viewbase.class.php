@@ -299,7 +299,7 @@ class ViewBase {
 	public function dispatch( $effectsclass ) {
 		if ( $this->error ) return;
 		
-		$code = $this->template != false ? $this->ReadTemplate( $this->folder . $this->template . '.tpl' ) : $this->code;
+		$code = $this->template != false ? $this->ReadTemplate( $this->folder . str_replace('.tpl', '', $this->template) . '.tpl' ) : $this->code;
 		
 		// Врезка дочерних шаблонов
 		foreach ( $this->childsv as $var => $value )
